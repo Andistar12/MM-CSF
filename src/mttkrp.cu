@@ -253,9 +253,11 @@ int main(int argc, char* argv[]){
         if(Opt.verbose)
             cout << "Starting MM-CSF" << endl;
 
+        cudaSetDevice(Opt.device);
+
         /*Collect slice and fiber stats: Create CSF for all modes*/
         bool slcNfbrStats = true;
-        int redunMode;
+        int redunMode = -1;
 
         Tensor *arrX = new Tensor[X.ndims]; 
 

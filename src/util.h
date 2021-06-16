@@ -1,8 +1,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#define DTYPE float
-#define ITYPE size_t // if chnage to unsigned int change the grid.x and gID in cuda kernel computation to long
+#define DTYPE double
+#define ITYPE uint64_t // if chnage to unsigned int change the grid.x and gID in cuda kernel computation to long
 
 #include <vector>
 #include <algorithm>
@@ -156,6 +156,7 @@ public:
     bool natOrdering = false;
     int redunMode;
     ITYPE fbrThreashold = 99999999;
+    ITYPE device = 0;
 
     void print() {
         std::cout << "R = " << R << '\n';
@@ -180,7 +181,7 @@ public:
     }
 };
 
-inline int check_opt(const Tensor &X, Options &Opt){
+inline __attribute__ ((optimize("O0"))) int check_opt(const Tensor &X, Options &Opt){
     
     if(X.ndims > 4){
         cout << "Supported tensor dimension is 3 or 4." << endl;
@@ -197,7 +198,7 @@ inline int check_opt(const Tensor &X, Options &Opt){
 
 } 
 
-inline int order_tensormode(Tensor &X, const Options &Opt, const int mode){
+inline __attribute__ ((optimize("O0"))) int order_tensormode(Tensor &X, const Options &Opt, const int mode){
 
     int *sortMode = new int[X.ndims]; //sorted according to mode length
     int *natMode = new int[X.ndims]; // natural ordering
@@ -255,7 +256,7 @@ inline int order_tensormode(Tensor &X, const Options &Opt, const int mode){
     }
 }
 
-inline int load_tensor(Tensor &X, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int load_tensor(Tensor &X, const Options &Opt){
     
     if(Opt.verbose)
         cout << endl << "Loading tensor.." << endl;   
@@ -314,7 +315,7 @@ inline int load_tensor(Tensor &X, const Options &Opt){
     return 0;
 }
 
-inline int init_tensor(Tensor *arrX, Tensor &X0, const Options &Opt, int mode){
+inline __attribute__ ((optimize("O0"))) int init_tensor(Tensor *arrX, Tensor &X0, const Options &Opt, int mode){
 
     ITYPE switchMode = 0;
     bool switchBC =  false;
@@ -331,7 +332,7 @@ inline int init_tensor(Tensor *arrX, Tensor &X0, const Options &Opt, int mode){
     order_tensormode(arrX[mode], Opt, mode);
 }
 
-inline bool sort_pred_3D(tuple <ITYPE, ITYPE, ITYPE, DTYPE> left, 
+inline __attribute__ ((optimize("O0"))) bool sort_pred_3D(tuple <ITYPE, ITYPE, ITYPE, DTYPE> left, 
                   tuple <ITYPE, ITYPE, ITYPE, DTYPE> right) {
 
     if (get<0>(left) != get<0>(right)) 
@@ -341,7 +342,7 @@ inline bool sort_pred_3D(tuple <ITYPE, ITYPE, ITYPE, DTYPE> left,
     
 }
 
-inline bool sort_pred_4D(tuple <ITYPE, ITYPE, ITYPE, ITYPE, DTYPE> left, 
+inline __attribute__ ((optimize("O0"))) bool sort_pred_4D(tuple <ITYPE, ITYPE, ITYPE, ITYPE, DTYPE> left, 
                   tuple <ITYPE, ITYPE, ITYPE, ITYPE, DTYPE> right) {
     // return get<0>(left) < get<0>(right);
 
@@ -354,7 +355,7 @@ inline bool sort_pred_4D(tuple <ITYPE, ITYPE, ITYPE, ITYPE, DTYPE> left,
     return (get<2>(left) < get<2>(right));
 }
 
-inline int sort_COOtensor(Tensor &X){
+inline __attribute__ ((optimize("O0"))) int sort_COOtensor(Tensor &X){
 
     const ITYPE mode0 = X.modeOrder[0];
     const ITYPE mode1 = X.modeOrder[1];
@@ -408,7 +409,7 @@ inline int sort_COOtensor(Tensor &X){
     }  
 }
 
-inline int sort_MI_CSF(const Tensor &X, TiledTensor *MTX, int m){
+inline __attribute__ ((optimize("O0"))) int sort_MI_CSF(const Tensor &X, TiledTensor *MTX, int m){
 
     const ITYPE mode0 = MTX[m].modeOrder[0];
     const ITYPE mode1 = MTX[m].modeOrder[1];
@@ -479,7 +480,7 @@ inline int sort_MI_CSF(const Tensor &X, TiledTensor *MTX, int m){
     // }
 }
 
-inline int create_hashtable(Tensor &X){
+inline __attribute__ ((optimize("O0"))) int create_hashtable(Tensor &X){
 
     // X.fbrHashTbl.reserve(X.totNnz);
 
@@ -493,7 +494,7 @@ inline int create_hashtable(Tensor &X){
     }
 }
 
-inline int print_COOtensor(const Tensor &X){
+inline __attribute__ ((optimize("O0"))) int print_COOtensor(const Tensor &X){
 
     cout << "Tensor X in COO format: " << endl;
 
@@ -504,7 +505,7 @@ inline int print_COOtensor(const Tensor &X){
     }           
 }
 
-inline int print_TiledCOO(const TiledTensor *TiledX, const int tile){
+inline __attribute__ ((optimize("O0"))) int print_TiledCOO(const TiledTensor *TiledX, const int tile){
 
     for(ITYPE x = 0; x < TiledX[tile].totNnz; ++x) {
         for (int i = 0; i < TiledX[tile].ndims; ++i)
@@ -513,7 +514,7 @@ inline int print_TiledCOO(const TiledTensor *TiledX, const int tile){
     }        
 }
 
-inline int print_HCSRtensor(const Tensor &X){
+inline __attribute__ ((optimize("O0"))) int print_HCSRtensor(const Tensor &X){
 
     cout << "no of fibers " << X.fbrPtr[1].size() << endl;
 
@@ -538,7 +539,7 @@ inline int print_HCSRtensor(const Tensor &X){
     }
 }
 
-inline int print_HCSRtensor_4D(const Tensor &X){
+inline __attribute__ ((optimize("O0"))) int print_HCSRtensor_4D(const Tensor &X){
 
     cout << "no of fibers " << X.fbrPtr[1].size() << endl;
 
@@ -568,7 +569,7 @@ inline int print_HCSRtensor_4D(const Tensor &X){
     }
 }
 
-inline int print_HYBtensor(const HYBTensor &HybX){
+inline __attribute__ ((optimize("O0"))) int print_HYBtensor(const HYBTensor &HybX){
 
     cout << "COO " << HybX.COOnnz << endl; 
 
@@ -619,7 +620,7 @@ inline int print_HYBtensor(const HYBTensor &HybX){
     }
 }
 
-inline int print_TiledHCSRtensor(TiledTensor *TiledX, int tile){
+inline __attribute__ ((optimize("O0"))) int print_TiledHCSRtensor(TiledTensor *TiledX, int tile){
 
     cout << "Tile " << tile << " of Tensor X in Tiled HCSR format: " << endl;
 
@@ -669,7 +670,7 @@ inline int print_TiledHCSRtensor(TiledTensor *TiledX, int tile){
 }
 
 
-inline int make_KTiling(const Tensor &X, TiledTensor *TiledX, Options &Opt){
+inline __attribute__ ((optimize("O0"))) int make_KTiling(const Tensor &X, TiledTensor *TiledX, Options &Opt){
 
     ITYPE mode0 = X.modeOrder[0];
     ITYPE mode1 = X.modeOrder[1];
@@ -712,7 +713,7 @@ inline int make_KTiling(const Tensor &X, TiledTensor *TiledX, Options &Opt){
     }  
 }
 
-inline int create_HCSR(Tensor &X, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int create_HCSR(Tensor &X, const Options &Opt){
  
     ITYPE fbrThreashold = Opt.fbrThreashold;
     if(Opt.impType == 12 )     
@@ -804,7 +805,7 @@ inline int create_HCSR(Tensor &X, const Options &Opt){
     return 0;
 }
 
-inline int create_HYB(HYBTensor &HybX, const Tensor &X, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int create_HYB(HYBTensor &HybX, const Tensor &X, const Options &Opt){
 
     ITYPE mode0 = HybX.modeOrder[0];
     ITYPE mode1 = HybX.modeOrder[1];
@@ -942,7 +943,7 @@ inline int create_HYB(HYBTensor &HybX, const Tensor &X, const Options &Opt){
     return 0;
 }
 // TBD: diff with 3d..avoided CSL
-inline int create_HYB_4D(HYBTensor &HybX, const Tensor &X, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int create_HYB_4D(HYBTensor &HybX, const Tensor &X, const Options &Opt){
 
     ITYPE mode0 = HybX.modeOrder[0];
     ITYPE mode1 = HybX.modeOrder[1];
@@ -1096,7 +1097,7 @@ inline int create_HYB_4D(HYBTensor &HybX, const Tensor &X, const Options &Opt){
     return 0;
 }
 //creating slice pointer
-inline int create_OuterMostPointer(TiledTensor *TiledX, const Options &Opt, int tile){
+inline __attribute__ ((optimize("O0"))) int create_OuterMostPointer(TiledTensor *TiledX, const Options &Opt, int tile){
  
     ITYPE slcCount =0;
     int mode0 = TiledX[0].modeOrder[0];
@@ -1122,7 +1123,7 @@ inline int create_OuterMostPointer(TiledTensor *TiledX, const Options &Opt, int 
     }
 }
 
-inline int prefix_sum(ITYPE *x, ITYPE *y, int n){
+inline __attribute__ ((optimize("O0"))) int prefix_sum(ITYPE *x, ITYPE *y, int n){
 
  
     for (int i=0;i<=(log((double)n)-1);i++){
@@ -1143,7 +1144,7 @@ inline int prefix_sum(ITYPE *x, ITYPE *y, int n){
     return 0;
 }
 
-inline int create_pointers(TiledTensor *TiledX, const Options &Opt, int tile){
+inline __attribute__ ((optimize("O0"))) int create_pointers(TiledTensor *TiledX, const Options &Opt, int tile){
 
     int mode0 = TiledX[0].modeOrder[0];
     
@@ -1272,7 +1273,7 @@ inline int create_pointers(TiledTensor *TiledX, const Options &Opt, int tile){
 }
 
 
-inline int create_TiledHCSR(TiledTensor *TiledX, const Options &Opt, int tile){
+inline __attribute__ ((optimize("O0"))) int create_TiledHCSR(TiledTensor *TiledX, const Options &Opt, int tile){
 
     ITYPE fbrThreashold = Opt.fbrThreashold;
     ITYPE fbrSThreshold = 999999999;
@@ -1392,7 +1393,7 @@ inline int create_TiledHCSR(TiledTensor *TiledX, const Options &Opt, int tile){
 
 /** computes cold misses*/
 
-inline int compute_reuse(Tensor &X, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int compute_reuse(Tensor &X, const Options &Opt){
 
     int mode2 = X.modeOrder[2];
     int mode1 = X.modeOrder[1];
@@ -1489,7 +1490,7 @@ inline int compute_reuse(Tensor &X, const Options &Opt){
     }
     cout << "avg reuse " << unqFbr << " " << X.nFibers << endl;
 }
-inline int compute_reuse(TiledTensor *TiledX, const Options &Opt, int mode){
+inline __attribute__ ((optimize("O0"))) int compute_reuse(TiledTensor *TiledX, const Options &Opt, int mode){
 
     int mode2 = TiledX[mode].modeOrder[2];
     int mode1 = TiledX[mode].modeOrder[1];
@@ -1589,7 +1590,7 @@ inline int compute_reuse(TiledTensor *TiledX, const Options &Opt, int mode){
     cout << "avg reuse " << usedFbr << " " << unqFbr <<" " << TiledX[mode].nFibers << endl;
 }
 
-inline int compute_reuse_distance(Tensor &X, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int compute_reuse_distance(Tensor &X, const Options &Opt){
 
     int mode1 = X.modeOrder[1];
     int mode2 = X.modeOrder[2];
@@ -1707,7 +1708,7 @@ inline int compute_reuse_distance(Tensor &X, const Options &Opt){
 }
 
 
-inline int create_fbrLikeSlcInds(Tensor &X, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int create_fbrLikeSlcInds(Tensor &X, const Options &Opt){
 
     X.fbrLikeSlcInds = (ITYPE *)malloc( X.nFibers * sizeof(ITYPE));
     
@@ -1720,7 +1721,7 @@ inline int create_fbrLikeSlcInds(Tensor &X, const Options &Opt){
     }
 }
 
-inline int create_fbrLikeSlcInds(TiledTensor *TiledX, int mode){
+inline __attribute__ ((optimize("O0"))) int create_fbrLikeSlcInds(TiledTensor *TiledX, int mode){
 
     TiledX[mode].fbrLikeSlcInds = (ITYPE *)malloc( TiledX[mode].nFibers * sizeof(ITYPE));
 
@@ -1738,7 +1739,7 @@ inline int create_fbrLikeSlcInds(TiledTensor *TiledX, int mode){
 }
 
 // changed param to HYB
-inline int make_HybBin(HYBTensor &X, const Options & Opt){
+inline __attribute__ ((optimize("O0"))) int make_HybBin(HYBTensor &X, const Options & Opt){
 
     ITYPE THREADLOAD = 2;
     ITYPE TB = 512;
@@ -1839,7 +1840,7 @@ inline int make_HybBin(HYBTensor &X, const Options & Opt){
     // }
 }
 
-inline int make_TiledBin(TiledTensor *TiledX, const Options & Opt, int tile){
+inline __attribute__ ((optimize("O0"))) int make_TiledBin(TiledTensor *TiledX, const Options & Opt, int tile){
 
     ITYPE THREADLOAD = 2;
     ITYPE TB = 512;
@@ -1906,7 +1907,7 @@ inline int make_TiledBin(TiledTensor *TiledX, const Options & Opt, int tile){
     // }
 }
 
-inline int tensor_stats(const Tensor &X){
+inline __attribute__ ((optimize("O0"))) int tensor_stats(const Tensor &X){
 
     ITYPE mode0 = X.modeOrder[0];
     int *nnzSlice = new int[X.fbrIdx[0].size()];
@@ -1962,7 +1963,7 @@ inline int tensor_stats(const Tensor &X){
     return 0;
 }
 
-inline int get_nnzPerFiberData(Tensor &X){
+inline __attribute__ ((optimize("O0"))) int get_nnzPerFiberData(Tensor &X){
 
     int sliceMode=X.modeOrder[0];
     int fiberMode=X.modeOrder[1];
@@ -2023,7 +2024,7 @@ inline int get_nnzPerFiberData(Tensor &X){
     return 0;
 }
 
-// inline int populate_paritions(const Tensor &X, TiledTensor *MTX){
+// inline __attribute__ ((optimize("O0"))) int populate_paritions(const Tensor &X, TiledTensor *MTX){
  
 //     // avoid pushback by using tot nnzperpart
 //     // do parallel
@@ -2040,7 +2041,7 @@ inline int get_nnzPerFiberData(Tensor &X){
 //     return 0;
 // }
 
-inline int populate_paritions(Tensor &X, TiledTensor *MTX){
+inline __attribute__ ((optimize("O0"))) int populate_paritions(Tensor &X, TiledTensor *MTX){
  
     // avoid pushback by using tot nnzperpart
     ITYPE *nnzCntr = new ITYPE[X.ndims];
@@ -2080,7 +2081,7 @@ inline int populate_paritions(Tensor &X, TiledTensor *MTX){
     return 0;
 }
 
-inline int binarySearch1(ITYPE *arr, ITYPE left, ITYPE right, ITYPE value) { 
+inline __attribute__ ((optimize("O0"))) int binarySearch1(ITYPE *arr, ITYPE left, ITYPE right, ITYPE value) { 
   
     while (left <= right) {
             // int middle = (left + right) / 2;
@@ -2095,7 +2096,7 @@ inline int binarySearch1(ITYPE *arr, ITYPE left, ITYPE right, ITYPE value) {
       return -1;
 }
 
-inline int binarySearch(ITYPE *arr, ITYPE l, ITYPE r, ITYPE x) { 
+inline __attribute__ ((optimize("O0"))) int binarySearch(ITYPE *arr, ITYPE l, ITYPE r, ITYPE x) { 
     
     if (r >= l) { 
         // int mid = ((unsigned int)left+(unsigned int)right) >> 1;
@@ -2113,13 +2114,13 @@ inline int binarySearch(ITYPE *arr, ITYPE l, ITYPE r, ITYPE x) {
     return -1; 
 }
 
-inline int maxOf3( int a, int b, int c )
+inline __attribute__ ((optimize("O0"))) int maxOf3( int a, int b, int c )
 {
    int max = ( a < b ) ? b : a;
    return ( ( max < c ) ? c : max );
 }
 
-inline int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Options & Opt){
+inline __attribute__ ((optimize("O0"))) int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Options & Opt){
 
     X.partPerNnz = new ITYPE[X.totNnz];
     memset(X.partPerNnz, 0, X.totNnz * sizeof(ITYPE));  
@@ -2317,16 +2318,16 @@ inline int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Op
 
                 /*linear search*/
 
-                // for (int fbr = arrX[m].denseSlcPtr[tmpSlc]; fbr < arrX[m].denseSlcPtr[tmpSlc+1]; ++fbr){  
+                for (int fbr = arrX[m].denseSlcPtr[tmpSlc]; fbr < arrX[m].denseSlcPtr[tmpSlc+1]; ++fbr){  
 
-                //     if(arrX[m].fbrIdx[1][fbr] == idx_j){
-                //         fbrNnz[m] = arrX[m].nnzPerFiber[fbr];
-                //         fbrNo[m] = curIdx[arrX[m].modeOrder[1]];
-                //         fbrSt[m] = fbr;
-                //         break;
-                //     }
-                // }
-                /*binary search*/
+                     if(arrX[m].fbrIdx[1][fbr] == idx_j){
+                         fbrNnz[m] = arrX[m].nnzPerFiber[fbr];
+                         fbrNo[m] = curIdx[arrX[m].modeOrder[1]];
+                         //fbrSt[m] = fbr;
+                         break;
+                     }
+                 }
+                /*binary search
                 {
                     int n =  arrX[m].denseSlcPtr[tmpSlc+1] - arrX[m].denseSlcPtr[tmpSlc];//sizeof(arr) / sizeof(arr[0]); 
                     ITYPE fbr = arrX[m].denseSlcPtr[tmpSlc];  
@@ -2335,6 +2336,8 @@ inline int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Op
                     fbrNo[m] = result+fbr;
                     fbrNnz[m] = tmp;
                 }
+               */ 
+                
             }
         }
 
@@ -2480,7 +2483,7 @@ inline int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Op
     }
 }
 // more detailed check
-// inline int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Options & Opt){
+// inline __attribute__ ((optimize("O0"))) int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Options & Opt){
 
 //     X.partPerNnz = new ITYPE[X.totNnz];
 //     memset(X.partPerNnz, 0, X.totNnz * sizeof(ITYPE));  
@@ -2810,7 +2813,7 @@ inline int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Op
 // }
 
 // can take the slice nnz conditions
-// inline int mm_partition_allMode(Tensor *arrX, Tensor &X, TiledTensor *MTX, Options & Opt){
+// inline __attribute__ ((optimize("O0"))) int mm_partition_allMode(Tensor *arrX, Tensor &X, TiledTensor *MTX, Options & Opt){
  
 //     X.partPerNnz = new ITYPE[X.totNnz];
 //     memset(X.partPerNnz, 0, X.totNnz * sizeof(ITYPE));  
@@ -3127,7 +3130,7 @@ inline int mm_partition_reuseBased(Tensor *arrX, Tensor &X, TiledTensor *MTX, Op
 //     //     MTX[m].totNnz = MTX[m].vals.size();
 // }
 
-inline int prepare_Y(const Tensor &X, semiSpTensor &Y, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int prepare_Y(const Tensor &X, semiSpTensor &Y, const Options &Opt){
     Y.nRows = X.nFibers;
     Y.nCols = Opt.R;
     Y.vals = (DTYPE *)malloc( X.nFibers * Opt.R * sizeof(DTYPE));
@@ -3135,7 +3138,7 @@ inline int prepare_Y(const Tensor &X, semiSpTensor &Y, const Options &Opt){
 
 }
 
-inline int create_mats(const Tensor &X, Matrix *U, const Options &Opt, bool ata){
+inline __attribute__ ((optimize("O0"))) int create_mats(const Tensor &X, Matrix *U, const Options &Opt, bool ata){
     
     ITYPE mode;
     ITYPE R = Opt.R;
@@ -3151,7 +3154,7 @@ inline int create_mats(const Tensor &X, Matrix *U, const Options &Opt, bool ata)
 }
 
 // jli added
-inline DTYPE RandomValue(void)
+inline __attribute__ ((optimize("O0"))) DTYPE RandomValue(void)
 {
   DTYPE v =  3.0 * ((DTYPE) rand() / (DTYPE) RAND_MAX);
   if(rand() % 2 == 0) {
@@ -3161,7 +3164,7 @@ inline DTYPE RandomValue(void)
 }
 
 
-inline int randomize_mats(const Tensor &X, Matrix *U, const Options &Opt){
+inline __attribute__ ((optimize("O0"))) int randomize_mats(const Tensor &X, Matrix *U, const Options &Opt){
 
     ITYPE mode;
 
@@ -3182,7 +3185,7 @@ inline int randomize_mats(const Tensor &X, Matrix *U, const Options &Opt){
     return 0;
 }
 
-inline int zero_mat(const Tensor &X, Matrix *U, ITYPE mode){
+inline __attribute__ ((optimize("O0"))) int zero_mat(const Tensor &X, Matrix *U, ITYPE mode){
     
     for(long r = 0; r < U[mode].nRows; ++r){
         for(long c = 0; c < U[mode].nCols; ++c) // or u[mode].nCols 
@@ -3191,7 +3194,7 @@ inline int zero_mat(const Tensor &X, Matrix *U, ITYPE mode){
     return 0;
 }
 
-inline void write_output_ttmY(semiSpTensor &Y, ITYPE mode, string outFile){
+inline __attribute__ ((optimize("O0"))) void write_output_ttmY(semiSpTensor &Y, ITYPE mode, string outFile){
     
     ofstream fp(outFile); 
     fp << Y.nRows << " x " << Y.nCols << " semiSpTensor" << endl;
@@ -3206,23 +3209,23 @@ inline void write_output_ttmY(semiSpTensor &Y, ITYPE mode, string outFile){
     }
 }
 
-inline void print_matrix(Matrix *U, ITYPE mode){
+inline __attribute__ ((optimize("O0"))) void print_matrix(Matrix *U, ITYPE mode){
     
     cout << U[mode].nRows << " x " << U[mode].nCols << " matrix" << endl;
     cout << std::fixed;
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < min(10, (int) U[mode].nRows); ++i)
     // for (int i = U[mode].nRows-5; i <  U[mode].nRows; ++i)
     {
         // for (int j = 0; j < U[mode].nCols; ++j)
-        for (int j = 0; j < 3; ++j)
+        for (int j = 0; j < min(10, (int) U[mode].nCols); ++j)
         {
-            cout << std::setprecision(2) << U[mode].vals[i * U[mode].nCols + j] << "\t" ;
+            cout << std::setprecision(3) << (float) U[mode].vals[i * U[mode].nCols + j] << "\t" ;
         }
         cout << endl;  
     }
 }
 
-inline void write_output(Matrix *U, ITYPE mode, string outFile){
+inline __attribute__ ((optimize("O0"))) void write_output(Matrix *U, ITYPE mode, string outFile){
     
     ofstream fp(outFile); 
     fp << U[mode].nRows << " x " << U[mode].nCols << " matrix" << endl;
@@ -3237,14 +3240,15 @@ inline void write_output(Matrix *U, ITYPE mode, string outFile){
     }
 }
 
-inline void correctness_check(DTYPE *out, DTYPE *COOout, int nr, int nc){
-    cout << "Correctness might not MATCH! Change random to fixed" << endl;
+inline __attribute__ ((optimize("O0"))) void correctness_check(DTYPE *out, DTYPE *COOout, int nr, int nc){
+    //cout << "Correctness might not MATCH! Change random to fixed" << endl;
+    cout << "correctness check nr=" << nr << " nc=" << nc << endl;
     long mismatch = 0;
     DTYPE maxDiff = 0;
-    DTYPE precision = 0.1;
     cout << std::fixed;
     for (int i = 0; i < nr; ++i){
         for (int j = 0; j < nc; ++j){
+            DTYPE precision = max(COOout[i * nc + j] * 1e-6, 1e-6);                
             DTYPE diff = abs(out[i * nc + j] - COOout[i * nc + j]);
             if( diff > precision){
                 if(diff > maxDiff)
@@ -3260,12 +3264,12 @@ inline void correctness_check(DTYPE *out, DTYPE *COOout, int nr, int nc){
     if(mismatch == 0)
         cout << "Correctness pass!" << endl;
     else{
-        cout <<  mismatch <<" mismatches found at " << precision << " precision. " << endl;
+        cout <<  mismatch <<" mismatches found at " << 1e-6 << " precision. " << endl;
         cout << "Maximum diff " << maxDiff << ". "<<endl;
     }
 }
 
-inline void free_all(Tensor &X, semiSpTensor &Y, Matrix *U){
+inline __attribute__ ((optimize("O0"))) void free_all(Tensor &X, semiSpTensor &Y, Matrix *U){
     
     free(Y.vals);
 
@@ -3275,13 +3279,13 @@ inline void free_all(Tensor &X, semiSpTensor &Y, Matrix *U){
 
 }
 
-inline double seconds(){
+inline __attribute__ ((optimize("O0"))) double seconds(){
     struct timeval tp;
     gettimeofday(&tp, NULL);
     return ((double)tp.tv_sec + (double)tp.tv_usec * 1.e-6);
 }
 
-inline void print_help_and_exit() {
+inline __attribute__ ((optimize("O0"))) void print_help_and_exit() {
     printf("options:\n\
         -R rank/feature : set the rank (default 32)\n\
         -m mode : set the mode of MTTKRP (default 0)\n\
@@ -3293,7 +3297,7 @@ inline void print_help_and_exit() {
     exit(1);
 }
 
-inline Options parse_cmd_options(int argc, char **argv) {
+inline __attribute__ ((optimize("O0"))) Options parse_cmd_options(int argc, char **argv) {
     
     Options param;
     int i;
@@ -3351,6 +3355,10 @@ inline Options parse_cmd_options(int argc, char **argv) {
                 param.verbose = true;
             else
                 param.verbose = false;
+            break;
+
+        case 'd':
+            param.device = atoi(argv[i]);
             break;
 
         case 'c':

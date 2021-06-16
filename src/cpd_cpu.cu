@@ -110,7 +110,7 @@ int MatrixSolveNormals(
   t0 = seconds();
   /* Cholesky factorization */
   bool is_spd = true;
-  spotrf_(&uplo, &rank, neqs, &rank, &info);
+  dpotrf_(&uplo, &rank, neqs, &rank, &info);
   if(info) {
     printf("Gram matrix is not SPD. Trying `gesv`.\n");
     is_spd = false;
@@ -121,7 +121,7 @@ int MatrixSolveNormals(
   /* Continue with Cholesky */
   if(is_spd) {
     /* Solve against rhs */
-    spotrs_(&uplo, &rank, &nrhs, neqs, &rank, rhs.vals, &rank, &info);
+    dpotrs_(&uplo, &rank, &nrhs, neqs, &rank, rhs.vals, &rank, &info);
     if(info) {
       printf("DPOTRS returned %d\n", info);
     }
@@ -136,7 +136,7 @@ int MatrixSolveNormals(
     // fa << "tmpATA after MatrixDotMulSeqTriangle recover: " << endl;
     // write_output(&tmpATA, 0, "ata.txt");
 
-    sgesv_(&rank, &nrhs, neqs, &rank, ipiv, rhs.vals, &rank, &info);
+    dgesv_(&rank, &nrhs, neqs, &rank, ipiv, rhs.vals, &rank, &info);
     // info = LAPACKE_sgesv(LAPACK_ROW_MAJOR, rank, nrhs, neqs, rank, ipiv, rhs.vals, rank);
 
     if(info) {
@@ -485,7 +485,7 @@ double cpd(Tensor &X, TiledTensor *MMCSF, Matrix * U, Options Opt, DTYPE * lambd
         //     blas_nrows, // The reduce dim size
         //     alpha, U[m].vals, blas_rank, 
         //     beta, ATA[m].vals, blas_rank);
-        ssyrk_(&uplo, &notrans, 
+        dsyrk_(&uplo, &notrans, 
             &blas_rank, &blas_nrows, 
             &alpha, U[m].vals, &blas_rank, 
             &beta, ATA[m].vals, &blas_rank);
@@ -591,7 +591,7 @@ double cpd(Tensor &X, TiledTensor *MMCSF, Matrix * U, Options Opt, DTYPE * lambd
             //     blas_rank, blas_nrows, 
             //     alpha, U[m].vals, blas_rank, 
             //     beta, ATA[m].vals, blas_rank);
-            ssyrk_(&uplo, &notrans, 
+            dsyrk_(&uplo, &notrans, 
                   &blas_rank, &blas_nrows, 
                   &alpha, U[m].vals, &blas_rank, 
                   &beta, ATA[m].vals, &blas_rank);

@@ -7,59 +7,59 @@ extern "C" {
 #endif		
 
 /* Cholesky factorization */
-void spotrf_(
+void dpotrf_(
     char *,
     int *,
-    float *,
+    double *,
     int *,
     int *);
-void spotrs_(
+void dpotrs_(
     char *, int *,
     int *,
-    float *,
+    double *,
     int *,
-    float *,
+    double *,
     int *,
     int *);
 
 /* Rank-k update. */
-void ssyrk_(
+void dsyrk_(
     char *,
     char *,
     int *,
     int *,
-    float *,
-    float *,
+    double *,
+    double *,
     int *,
-    float *,
-    float *,
+    double *,
+    double *,
     int *);
 
 /* LU */
-void sgetrf_(
+void dgetrf_(
     int *,
     int *,
-    float *,
+    double *,
     int *,
     int *,
     int *);
-void sgetrs_(
+void dgetrs_(
     char *,
     int *,
     int *,
-    float *,
+    double *,
     int *,
     int *,
-    float *,
+    double *,
     int *,
     int *);
-void sgesv_(
+void dgesv_(
     int *,
     int *,
-    float *,
+    double *,
     int *,
     int *,
-    float *,
+    double *,
     int *,
     int *);
 
