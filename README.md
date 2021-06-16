@@ -1,3 +1,11 @@
+Fork of [MM-CSF](https://github.com/isratnisa/MM-CSF) that fixes bugs and changes 32 bit BLAS calls to 64 bit.
+
+**Do not measure preprocessing time with this build. It is set to -O0 optimization level.**
+
+
+
+
+
 MM-CSF or MixedMode-CSF is a CSF based storage format that partitions the tensor's nonzero elements into disjoint sections, each of which is compressed to create fibers along a different mode. It enables high-performance, compressed, and load-balanced execution of tensor kernels on GPUs. Currently, it supports MTTKRP kernel from CP decomposition. In future, we plan to extend it to support all generic sparse tensor kernels. This is a followup work of BCSF (https://ieeexplore.ieee.org/document/8821030), published in IPDPS'2019. Details of MM-CSF be found in the following links:  
 Paper:https://dl.acm.org/doi/abs/10.1145/3295500.3356216  
 Slides:http://sc19.supercomputing.org/proceedings/tech_paper/tech_paper_files/pap513s5.pdf
